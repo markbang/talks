@@ -108,11 +108,10 @@ jobs:
               name=$(basename "$dir")
               echo -n "<li><a href='./$name/'>$name</a>" >> dist/index.html
               
-              # 检查是否存在PDF文件
-              if [ -f "$name.pdf" ]; then
-                echo -n "<a href='./$name.pdf' class='pdf-link'>下载PDF</a>" >> dist/index.html
+              # 检查 $name.pdf 是否在 dist 目录中
+              if [ -f "dist/$name.pdf" ]; then
+                echo -n " <a href='./$name.pdf' class='pdf-link'>下载PDF</a>" >> dist/index.html
               fi
-              
               echo "</li>" >> dist/index.html
             fi
           done

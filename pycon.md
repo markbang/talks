@@ -1,6 +1,6 @@
 ---
 theme: seriph
-title: Welcome to Slidev
+title: 测试
 ---
 
 # 第一页

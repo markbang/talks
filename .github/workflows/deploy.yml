@@ -1,0 +1,60 @@
+name: Deploy Multiple Slidev Presentations
+
+on:
+  push:
+    branches:
+      - main # 或者您的默认分支
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Find markdown files
+        id: find-md
+        run: |
+          echo "files=$(ls *.md | grep -v 'README\|CONTRIBUTING\|LICENSE\|CHANGELOG' | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+
+      - name: Build presentations
+        id: build
+        run: |
+          mkdir -p dist
+          FILES=$(echo '${{ steps.find-md.outputs.files }}' | jq -r '.[]')
+          for file in $FILES; do
+            name=$(basename "$file" .md)
+            echo "Building $name from $file"
+            pnpm slidev build "$file" --base "/$name/" --out "dist/$name"
+          done
+
+      - name: Create index page
+        run: |
+          FILES=$(echo '${{ steps.find-md.outputs.files }}' | jq -r '.[]')
+          echo "<html><head><title>Slidev Presentations</title></head><body><h1>Available Presentations</h1><ul>" > dist/index.html
+          for file in $FILES; do
+            name=$(basename "$file" .md)
+            echo "<li><a href='/$name/'>$name</a></li>" >> dist/index.html
+          done
+          echo "</ul></body></html>" >> dist/index.html
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages

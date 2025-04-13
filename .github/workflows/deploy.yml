@@ -84,6 +84,7 @@ jobs:
         run: |
           echo '<html>
           <head>
+            <meta charset="UTF-8">
             <title>Slidev Presentations</title>
             <style>
               body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
@@ -103,13 +104,11 @@ jobs:
           for dir in dist/*/; do
             if [ -d "$dir" ]; then
               name=$(basename "$dir")
-              echo -n "<li><a href='/$name/'>在线幻灯片: $name</a>" >> dist/index.html
+              echo -n "<li><a href='./$name/'>$name</a>" >> dist/index.html
               
               # 检查是否存在PDF文件
-              if [ -f "$dir/slides-export.pdf" ]; then
-                echo -n "<a href='/$name/slides-export.pdf' class='pdf-link'>下载PDF</a>" >> dist/index.html
-              elif [ -f "$dir/$name.pdf" ]; then
-                echo -n "<a href='/$name/$name.pdf' class='pdf-link'>下载PDF</a>" >> dist/index.html
+              if [ -f "$name.pdf" ]; then
+                echo -n "<a href='./$name.pdf' class='pdf-link'>下载PDF</a>" >> dist/index.html
               fi
               
               echo "</li>" >> dist/index.html

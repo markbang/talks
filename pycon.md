@@ -1,6 +1,6 @@
 ---
 theme: seriph
-title: 测试1
+title: 测试
 ---
 
 # 第一页

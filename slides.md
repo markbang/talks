@@ -5,7 +5,7 @@ theme: seriph
 # like them? see https://unsplash.com/collections/94734566/slidev
 background: https://cover.sli.dev
 # some information about your slides (markdown enabled)
-title: Welcome to Slidev 第一个测试0
+title: Welcome to Slidev 第一个测试
 info: |
   ## Slidev Starter Template
   Presentation slides for developers.

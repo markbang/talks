@@ -42,34 +42,55 @@ jobs:
       - name: Get changed files
         id: changed-files
         run: |
-          # 获取所有变更的文件
-          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | grep '\.md$' | grep -v 'README\|CONTRIBUTING\|LICENSE\|CHANGELOG' || echo "")
-          echo "Changed markdown files: $CHANGED_FILES"
-          echo "files=$(echo "$CHANGED_FILES" | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
+          BASE_SHA="${{ github.event.before }}"
+          CURRENT_SHA="${{ github.sha }}"
+
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            BASE_SHA=$(git rev-list --max-parents=0 HEAD)
+          fi
+
+          CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$CURRENT_SHA")
+          CHANGED_MARKDOWN=$(echo "$CHANGED_FILES" | grep '\.md$' | grep -v 'README\|CONTRIBUTING\|LICENSE\|CHANGELOG' || true)
+          DEPLOY_SUPPORT_FILES=$(echo "$CHANGED_FILES" | grep -E '^(\.github/workflows/deploy\.yml|scripts/generate-index\.mjs|package\.json|pnpm-lock\.yaml)$' || true)
+
+          SHOULD_DEPLOY=false
+          if [ -n "$CHANGED_MARKDOWN" ] || [ -n "$DEPLOY_SUPPORT_FILES" ]; then
+            SHOULD_DEPLOY=true
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          echo "Changed markdown files:"
+          echo "$CHANGED_MARKDOWN"
+          echo "Deployment support changes:"
+          echo "$DEPLOY_SUPPORT_FILES"
+          echo "should_deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
+          echo "files=$(echo "$CHANGED_MARKDOWN" | jq -R -s -c 'split("\n") | map(select(length > 0))')" >> $GITHUB_OUTPUT
 
       - name: Checkout gh-pages branch
-        if: success() && steps.changed-files.outputs.files != '[]'
+        if: success() && steps.changed-files.outputs.should_deploy == 'true'
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: prev-dist
           fetch-depth: 1
 
-      - name: Build changed presentations
-        if: steps.changed-files.outputs.files != '[]'
-        id: build
+      - name: Prepare dist
+        if: steps.changed-files.outputs.should_deploy == 'true'
         run: |
           mkdir -p dist
-          # 复制之前的构建结果
           if [ -d "prev-dist" ]; then
             cp -r prev-dist/* dist/ 2>/dev/null || true
             echo "Previous build results copied"
           fi
 
-          # 处理变更的文件
+      - name: Build changed presentations
+        if: steps.changed-files.outputs.files != '[]'
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: |
           FILES=$(echo '${{ steps.changed-files.outputs.files }}' | jq -r '.[]')
           for file in $FILES; do
-            # 跳过非根目录的 markdown 文件
             if [[ "$file" != *.md || "$file" == */* ]]; then
               echo "Skipping non-root markdown file: $file"
               continue
@@ -82,47 +103,12 @@ jobs:
           done
 
       - name: Update index page
-        if: success() && steps.changed-files.outputs.files != '[]'
+        if: success() && steps.changed-files.outputs.should_deploy == 'true'
         run: |
-          echo '<html>
-          <head>
-            <meta charset="UTF-8">
-            <title>Slidev Presentations</title>
-            <style>
-              body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-              h1 { color: #333; }
-              ul { list-style-type: none; padding: 0; }
-              li { margin: 10px 0; padding: 10px; border-bottom: 1px solid #eee; }
-              a { color: #0366d6; text-decoration: none; margin-right: 15px; }
-              a:hover { text-decoration: underline; }
-              .pdf-link { color: #d73a49; }
-            </style>
-          </head>
-          <body>
-            <h1>Available Presentations</h1>
-            <ul>' > dist/index.html
-            
-          # 找出所有演示文稿目录
-          for dir in dist/*/; do
-            if [ -d "$dir" ]; then
-              name=$(basename "$dir")
-              echo -n "<li><a href='./$name/'>$name</a>" >> dist/index.html
-              
-              # 检查 $name.pdf 是否在 dist 目录中
-              if [ -f "dist/$name.pdf" ]; then
-                echo -n " <a href='./$name.pdf' class='pdf-link'>下载PDF</a>" >> dist/index.html
-              fi
-              echo "</li>" >> dist/index.html
-            fi
-          done
-
-          echo '</ul>
-            <p>Last updated: '"$(date)"'</p>
-          </body>
-          </html>' >> dist/index.html
+          node scripts/generate-index.mjs dist
 
       - name: Deploy
-        if: success() && steps.changed-files.outputs.files != '[]'
+        if: success() && steps.changed-files.outputs.should_deploy == 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist

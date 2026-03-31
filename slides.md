@@ -1,18 +1,13 @@
 ---
 # You can also start simply with 'default'
 theme: seriph
-# random image from a curated Unsplash collection by Anthony
-# like them? see https://unsplash.com/collections/94734566/slidev
-background: https://cover.sli.dev
 # some information about your slides (markdown enabled)
-title: Welcome to Slidev 第一个测试
+title: Bangwu Talks
 info: |
-  ## Slidev Starter Template
-  Presentation slides for developers.
-
-  Learn more at [Sli.dev](https://sli.dev)
+  ## Bangwu Talks
+  一套基于 Slidev 的技术分享演示文稿。
 # apply unocss classes to the current slide
-class: text-center
+class: cover-shell
 # https://sli.dev/features/drawing
 drawings:
   persist: false
@@ -25,22 +20,180 @@ mdc: true
 #  ogImage: https://cover.sli.dev
 ---
 
-# Welcome to Slidev
+<div class="cover-orb cover-orb-left" />
+<div class="cover-orb cover-orb-right" />
 
-Presentation slides for developers
+<div class="cover-grid">
+  <div class="cover-copy">
+    <p class="cover-kicker">Bangwu Talks</p>
+    <h1 class="cover-title">把技术内容讲得更清楚一点</h1>
+    <p class="cover-lead">
+      基于 Slidev 的演示稿模板，适合开发者分享、内部复盘和社区演讲。
+      首页现在改成了更正式的封面结构，信息层级和视觉焦点都会更稳定。
+    </p>
+    <div class="cover-tags">
+      <span>Slidev 52</span>
+      <span>Vue 3.5</span>
+      <span>Markdown First</span>
+    </div>
+  </div>
 
-<div @click="$slidev.nav.next" class="mt-12 py-1" hover:bg="white op-10">
-  Press Space for next page <carbon:arrow-right />
+  <div class="cover-panel">
+    <p class="cover-panel-label">Deck Snapshot</p>
+    <h2 class="cover-panel-title">从模板页切到分享页</h2>
+    <ul class="cover-points">
+      <li>去掉默认脚手架占位文案</li>
+      <li>强化标题、摘要和操作提示</li>
+      <li>保留后续内容页作为正文骨架</li>
+    </ul>
+    <div class="cover-action" @click="$slidev.nav.next">
+      按 Space 开始
+      <carbon:arrow-right />
+    </div>
+  </div>
 </div>
 
-<div class="abs-br m-6 text-xl">
-  <button @click="$slidev.nav.openInEditor()" title="Open in Editor" class="slidev-icon-btn">
-    <carbon:edit />
-  </button>
-  <a href="https://github.com/slidevjs/slidev" target="_blank" class="slidev-icon-btn">
-    <carbon:logo-github />
-  </a>
-</div>
+<style>
+.slidev-layout.cover-shell {
+  position: relative;
+  overflow: hidden;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at top left, rgba(46, 144, 182, 0.32), transparent 34%),
+    radial-gradient(circle at right center, rgba(217, 119, 87, 0.28), transparent 30%),
+    linear-gradient(135deg, #07111f 0%, #0f2740 45%, #132f4f 100%);
+}
+
+.cover-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
+  gap: 2rem;
+  align-items: end;
+  min-height: 100%;
+  padding: 3rem 3.25rem;
+}
+
+.cover-copy {
+  max-width: 42rem;
+}
+
+.cover-kicker,
+.cover-panel-label {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.cover-title,
+.slidev-layout.cover-shell h1 {
+  margin: 1rem 0 1.25rem;
+  font-size: 3.4rem;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+  color: #f8fafc;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.cover-lead {
+  margin: 0;
+  max-width: 36rem;
+  font-size: 1.06rem;
+  line-height: 1.8;
+  color: rgba(226, 232, 240, 0.82);
+}
+
+.cover-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.cover-tags span {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.82rem;
+  color: #e2e8f0;
+}
+
+.cover-panel {
+  position: relative;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.5rem;
+  background: rgba(7, 17, 31, 0.56);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(18px);
+}
+
+.cover-panel-title {
+  margin: 0.65rem 0 1rem;
+  font-size: 1.5rem;
+  line-height: 1.3;
+  color: #f8fafc;
+}
+
+.cover-points {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: rgba(226, 232, 240, 0.86);
+  line-height: 1.9;
+}
+
+.cover-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+  padding: 0.72rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f97316 0%, #fb7185 100%);
+  color: #fff7ed;
+  font-weight: 600;
+}
+
+.cover-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(55px);
+  opacity: 0.55;
+}
+
+.cover-orb-left {
+  top: 3rem;
+  left: 2rem;
+  width: 10rem;
+  height: 10rem;
+  background: rgba(59, 130, 246, 0.4);
+}
+
+.cover-orb-right {
+  right: 8rem;
+  bottom: 3rem;
+  width: 12rem;
+  height: 12rem;
+  background: rgba(249, 115, 22, 0.35);
+}
+
+@media (max-width: 900px) {
+  .cover-grid {
+    grid-template-columns: 1fr;
+    padding: 2.5rem 1.75rem;
+  }
+
+  .cover-title,
+  .slidev-layout.cover-shell h1 {
+    font-size: 2.6rem;
+  }
+}
+</style>
 
 <!--
 The last comment block of each slide will be treated as slide notes. It will be visible and editable in Presenter Mode along with the slide. [Read more in the docs](https://sli.dev/guide/syntax.html#notes)

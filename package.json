@@ -3,18 +3,18 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "slidev build",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' slidev build",
     "dev": "slidev --open",
-    "export": "slidev export"
+    "export": "NODE_OPTIONS='--max-old-space-size=4096' slidev export"
   },
   "dependencies": {
-    "@slidev/cli": "^51.5.0",
+    "@slidev/cli": "^52.14.1",
     "@slidev/theme-default": "latest",
     "@slidev/theme-seriph": "latest",
     "slidev-theme-academic": "^2.1.0",
-    "vue": "^3.5.13"
+    "vue": "^3.5.31"
   },
   "devDependencies": {
-    "playwright-chromium": "^1.51.1"
+    "playwright-chromium": "^1.58.2"
   }
 }
